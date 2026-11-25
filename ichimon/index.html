@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="一問一答">
+<title>一問一答</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#2f6f5e">
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#1f2328; --sub:#6b6f76; --line:#e3dfd6;
+  --accent:#2f6f5e; --accent-ink:#ffffff; --ok:#2f7d4f; --ng:#c0662b; --ng-bg:#fbeee4; --ok-bg:#e6f3ea;
+  --shadow:0 2px 14px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#16181b; --card:#212429; --ink:#eceae5; --sub:#9a9ea5; --line:#33373d;
+    --accent:#5fb39b; --accent-ink:#0f1412; --ok:#6cc48d; --ng:#e89a62; --ng-bg:#3a2a1f; --ok-bg:#1e3326;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+  padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);
+  max-width:720px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
+}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.02em}
+.iconbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:transparent;color:var(--sub);padding:10px 6px;font-size:15px;border-radius:9px;font-weight:600}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.stats{display:flex;gap:14px;font-size:13px;color:var(--sub);margin:0 2px 12px}
+.stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+.card{
+  flex:1;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  padding:22px 20px;display:flex;flex-direction:column;min-height:300px;cursor:pointer;user-select:none;
+}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:14px}
+.tag{padding:2px 8px;border-radius:999px;font-weight:600}
+.tag.ng{background:var(--ng-bg);color:var(--ng)}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.q{font-size:21px;line-height:1.6;font-weight:600;white-space:pre-wrap;word-break:break-word}
+.a{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);font-size:19px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:var(--accent)}
+.hint{margin-top:auto;padding-top:18px;text-align:center;color:var(--sub);font-size:14px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.actions button{border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:700}
+.b-ng{background:var(--ng-bg);color:var(--ng)}
+.b-ok{background:var(--ok-bg);color:var(--ok)}
+.b-main{background:var(--accent);color:var(--accent-ink);grid-column:1/-1}
+.empty{text-align:center;color:var(--sub);margin:auto 0;line-height:1.8}
+/* manage */
+#manage{display:none}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+section h2{font-size:15px;margin:0 0 8px}
+section p{font-size:13px;color:var(--sub);margin:0 0 10px;line-height:1.6}
+textarea,input[type=text]{
+  width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);
+  padding:10px;font-size:16px;font-family:inherit;resize:vertical
+}
+textarea{min-height:90px}
+label{display:block;font-size:13px;color:var(--sub);margin:8px 0 4px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:0;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.btn.sub{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;border:1px solid var(--ng);color:var(--ng)}
+.msg{font-size:13px;color:var(--accent);margin-top:8px;min-height:1em}
+ul.list{list-style:none;padding:0;margin:0}
+ul.list li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.5}
+ul.list li:first-child{border-top:0}
+ul.list .txt{flex:1;word-break:break-word;white-space:pre-wrap}
+ul.list .txt small{color:var(--sub)}
+ul.list button{border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:8px;padding:4px 8px;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+  ここに問題を追加してね（1行1問）
+  Excelで「問題 | 答え」の2列を選んでコピー → この下にそのまま貼り付けでOK
+  （列の区切りはタブ文字。Excelからコピーすると自動でタブになる）
+  1列目の文言が同じなら同じ問題として扱うので、答えを直しても「不安」の印は残る
+====================================================================== -->
+<script type="text/plain" id="base-data">
+膵嚢胞で「ブドウの房状」「イクラ状」→？	膵管内乳頭粘液性腫瘍（IPMN）
+膵管内乳頭粘液性腫瘍（IPMN）の好発部位と好発者は？	膵頭部・高齢男性
+HIV合併のニューモシスチス肺炎の治療は？	ST合剤＋副腎皮質ステロイド
+小児のネフローゼ症候群の初期対応は？	腎生検をせずにステロイド
+若い女性の気胸 →？	肺リンパ脈管筋腫症（LAM）
+VHL（von Hippel-Lindau病）の発症年齢は？　二相性？	若年〜中年。二相性ではない
+WPW症候群に遺伝性はある？	なし
+児頭大横径・大腿骨長・胎嚢・頭殿長から推測するのは？	妊娠週数
+腰部脊柱管狭窄症が改善する姿勢は？	安静・前屈
+PCOSで挙児希望がない場合の治療は？	ホルムストローム療法
+幽門輪温存膵頭十二指腸切除術で切除しない臓器は？	胃
+産後出血＋子宮底を触れない →？	子宮内反症
+Parkinson病の薬といえば？	レボドパ
+123I-MIBGの取り込み →？	褐色細胞腫
+気管支喘息の長期管理は？	ステロイド吸入
+飛蚊症の後の視野欠損 →？（治療も）	裂孔原性網膜剥離（治療：硝子体手術、強膜バックリング術）
+鱗屑をはがすと点状出血 →？	Auspitz現象
+qSOFAスコアの3項目は？	意識変容（GCS15未満）、呼吸数≧22回/分、収縮期血圧≦100mmHg
+PML/RARA融合遺伝子 →？	急性前骨髄球性白血病（APL、AML-M3）
+びまん性汎細気管支炎の治療は？	エリスロマイシンなどの14員環マクロライド
+動脈管開存症で聴取する雑音は？	連続性雑音
+感冒症状・頭痛・耳鳴・視力低下 →？（関連HLAと治療も）	フォークト-小柳-原田病／HLA-DR4陽性（治療：ステロイドパルス、ステロイド点眼）
+献腎移植の待機期間は？	約15年
+視神経脊髄炎は何性疾患？	脱髄性疾患
+肥大型心筋症で認める弁の動きは？	収縮期僧帽弁前方運動（SAM）
+ギラン・バレー症候群にステロイドは有効？	無効
+急性胆嚢炎の治療は？	腹腔鏡下胆嚢摘出術、経皮経肝胆嚢ドレナージ
+体外衝撃波結石破砕術（ESWL）は何の治療？	尿路結石
+</script>
+
+<div id="quiz">
+  <header>
+    <h1>一問一答</h1>
+    <button class="iconbtn" id="toManage">問題の追加・管理</button>
+  </header>
+  <div class="seg" id="modeSeg">
+    <button data-mode="all" class="on">全問</button>
+    <button data-mode="ng">不安だけ</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="card" id="card"></div>
+  <div class="actions" id="actions"></div>
+</div>
+
+<div id="manage">
+  <header>
+    <h1>問題の追加・管理</h1>
+    <button class="iconbtn" id="toQuiz">戻る</button>
+  </header>
+
+  <section>
+    <h2>まとめて追加（Excelから）</h2>
+    <p>Excelで「問題」と「答え」の2列を選んでコピーして、下に貼り付けてね。<br>手で打つときは「問題 → 答え」の形で1行1問でもOK。</p>
+    <textarea id="bulk" placeholder="例）若い女性の気胸 → 肺リンパ脈管筋腫症"></textarea>
+    <div class="row"><button class="btn" id="bulkAdd">追加する</button></div>
+    <div class="msg" id="bulkMsg"></div>
+  </section>
+
+  <section>
+    <h2>1問ずつ追加</h2>
+    <label for="oneQ">問題</label>
+    <textarea id="oneQ" style="min-height:60px"></textarea>
+    <label for="oneA">答え</label>
+    <textarea id="oneA" style="min-height:60px"></textarea>
+    <div class="row"><button class="btn" id="oneAdd">追加する</button></div>
+    <div class="msg" id="oneMsg"></div>
+  </section>
+
+  <section>
+    <h2>自分で追加した問題（<span id="userCount">0</span>問）</h2>
+    <p>ここにあるのはこの端末だけに保存されてるよ。新しいファイルに入れ替えても消えない。</p>
+    <ul class="list" id="userList"></ul>
+  </section>
+
+  <section>
+    <h2>バックアップ</h2>
+    <p>自分で追加した問題と「不安」の印を書き出しておけるよ。機種変更のときや、データが消えたときに読み込んで戻せる。</p>
+    <div class="row">
+      <button class="btn sub" id="exportBtn">書き出す（ファイル）</button>
+      <button class="btn sub" id="importBtn">読み込む（ファイル）</button>
+      <input type="file" id="importFile" accept=".json,application/json,text/plain" hidden>
+    </div>
+    <div class="msg" id="backupMsg"></div>
+  </section>
+
+  <section>
+    <h2>リセット</h2>
+    <div class="row">
+      <button class="btn danger" id="resetLabels">「不安」「できた」の印を全部消す</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const LS_KEY = 'ichimon_v1';
+
+  // ---------- storage ----------
+  function load(){
+    try{
+      const s = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+      if (s && typeof s === 'object') return {user: s.user || [], labels: s.labels || {}};
+    }catch(e){}
+    return {user: [], labels: {}};
+  }
+  let store = load();
+  function save(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(store)); }catch(e){}
+  }
+
+  // ---------- parsing ----------
+  function hash(str){
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return 'q' + (h >>> 0).toString(36);
+  }
+  function norm(s){ return s.replace(/\s+/g, ' ').trim(); }
+  function idOf(q){ return hash(norm(q)); }
+
+  // Excelのコピー（タブ区切り、セル内改行は "..." で囲まれる）を読む
+  function parseTSV(text){
+    const rows = []; let row = [], cell = '', inQ = false;
+    text = text.replace(/\r\n?/g, '\n');
+    for (let i = 0; i < text.length; i++){
+      const c = text[i];
+      if (inQ){
+        if (c === '"'){
+          if (text[i+1] === '"'){ cell += '"'; i++; } else inQ = false;
+        } else cell += c;
+      } else if (c === '"' && cell === ''){ inQ = true; }
+      else if (c === '\t'){ row.push(cell); cell = ''; }
+      else if (c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    row.push(cell); rows.push(row);
+    const out = [];
+    for (const r of rows){
+      let q, a;
+      const cells = r.map(x => x.trim()).filter(x => x !== '');
+      if (cells.length >= 2){ q = cells[0]; a = cells.slice(1).join('\n'); }
+      else if (cells.length === 1){
+        const m = cells[0].match(/^(.+?)\s*(?:→|⇒|->|=>)\s*(.+)$/);
+        if (!m) continue;
+        q = m[1]; a = m[2];
+      } else continue;
+      if (q === '問題' && /^答え?$/.test(a)) continue; // 見出し行
+      out.push({q, a});
+    }
+    return out;
+  }
+
+  const base = parseTSV(document.getElementById('base-data').textContent)
+    .map(x => ({...x, id: idOf(x.q), own: false}));
+
+  function allItems(){
+    const seen = new Set(base.map(x => x.id));
+    const user = store.user.filter(x => !seen.has(x.id)).map(x => ({...x, own: true}));
+    return base.concat(user);
+  }
+
+  // ---------- quiz ----------
+  let mode = 'all', deck = [], pos = 0, revealed = false, roundDone = false;
+  const $ = id => document.getElementById(id);
+
+  function shuffle(a){
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function pool(){
+    const items = allItems();
+    return mode === 'ng' ? items.filter(x => store.labels[x.id] === 'ng') : items;
+  }
+  function newRound(){
+    deck = shuffle(pool().map(x => x.id)); pos = 0; revealed = false; roundDone = false;
+    render();
+  }
+  function current(){
+    const items = allItems();
+    while (pos < deck.length){
+      const it = items.find(x => x.id === deck[pos]);
+      if (it) return it;
+      pos++;
+    }
+    return null;
+  }
+
+  function renderStats(){
+    const items = allItems();
+    const ng = items.filter(x => store.labels[x.id] === 'ng').length;
+    const ok = items.filter(x => store.labels[x.id] === 'ok').length;
+    $('stats').innerHTML = `全 <b>${items.length}</b> 問　不安 <b>${ng}</b>　できた <b>${ok}</b>　まだ <b>${items.length - ng - ok}</b>`;
+  }
+
+  function el(tag, cls, text){
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render(){
+    renderStats();
+    const card = $('card'), act = $('actions');
+    card.innerHTML = ''; act.innerHTML = '';
+    const it = roundDone ? null : current();
+
+    if (!it){
+      const msg = el('div', 'empty');
+      if (deck.length === 0){
+        msg.innerHTML = mode === 'ng'
+          ? '「不安」の問題はないよ 🎉<br>全問モードで解いてみてね'
+          : 'まだ問題がないよ<br>「問題の追加・管理」から追加してね';
+        card.appendChild(msg);
+      } else {
+        msg.innerHTML = `一周おわり！おつかれさま 🎉<br>${deck.length}問解いたよ`;
+        card.appendChild(msg);
+        const b = el('button', 'b-main', 'もう一周（シャッフル）');
+        b.onclick = newRound; act.appendChild(b);
+      }
+      card.onclick = null;
+      return;
+    }
+
+    const meta = el('div', 'meta');
+    meta.appendChild(el('span', null, `${pos + 1} / ${deck.length}`));
+    const lab = store.labels[it.id];
+    if (lab === 'ng') meta.appendChild(el('span', 'tag ng', '不安'));
+    else if (lab === 'ok') meta.appendChild(el('span', 'tag ok', 'できた'));
+    card.appendChild(meta);
+    card.appendChild(el('div', 'q', it.q));
+
+    if (revealed){
+      card.appendChild(el('div', 'a', it.a));
+      card.onclick = null;
+      const ng = el('button', 'b-ng', '不安');
+      const ok = el('button', 'b-ok', 'できた');
+      ng.onclick = () => mark(it, 'ng');
+      ok.onclick = () => mark(it, 'ok');
+      act.append(ng, ok);
+    } else {
+      card.appendChild(el('div', 'hint', 'タップで答えを表示'));
+      card.onclick = () => { revealed = true; render(); };
+    }
+  }
+
+  function mark(it, v){
+    store.labels[it.id] = v; save();
+    pos++; revealed = false;
+    if (pos >= deck.length) roundDone = true;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  $('modeSeg').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    mode = b.dataset.mode;
+    [...$('modeSeg').children].forEach(x => x.classList.toggle('on', x === b));
+    newRound();
+  });
+
+  // ---------- manage ----------
+  function show(which){
+    $('quiz').style.display = which === 'quiz' ? '' : 'none';
+    $('manage').style.display = which === 'manage' ? 'block' : 'none';
+    window.scrollTo(0, 0);
+  }
+  $('toManage').onclick = () => { renderUserList(); show('manage'); };
+  $('toQuiz').onclick = () => { show('quiz'); newRound(); };
+
+  function addItems(list){
+    const existing = new Set(allItems().map(x => x.id));
+    let added = 0, dup = 0;
+    for (const x of list){
+      const id = idOf(x.q);
+      if (existing.has(id)){ dup++; continue; }
+      store.user.push({id, q: x.q, a: x.a});
+      existing.add(id); added++;
+    }
+    save();
+    return {added, dup};
+  }
+
+  function flash(id, text){ $(id).textContent = text; }
+
+  $('bulkAdd').onclick = () => {
+    const list = parseTSV($('bulk').value);
+    if (!list.length){ flash('bulkMsg', '読み取れる問題がなかったよ（2列で貼り付けるか「問題 → 答え」の形にしてね）'); return; }
+    const r = addItems(list);
+    flash('bulkMsg', `${r.added}問追加したよ` + (r.dup ? `（${r.dup}問は同じ問題があったのでスキップ）` : ''));
+    $('bulk').value = '';
+    renderUserList();
+  };
+
+  $('oneAdd').onclick = () => {
+    const q = $('oneQ').value.trim(), a = $('oneA').value.trim();
+    if (!q || !a){ flash('oneMsg', '問題と答えの両方を入れてね'); return; }
+    const r = addItems([{q, a}]);
+    flash('oneMsg', r.added ? '追加したよ' : '同じ問題がもうあるよ');
+    if (r.added){ $('oneQ').value = ''; $('oneA').value = ''; }
+    renderUserList();
+  };
+
+  function renderUserList(){
+    const ul = $('userList'); ul.innerHTML = '';
+    $('userCount').textContent = store.user.length;
+    if (!store.user.length){ ul.appendChild(el('li', null, 'まだないよ')); return; }
+    store.user.slice().reverse().forEach(x => {
+      const li = el('li');
+      const t = el('div', 'txt');
+      t.appendChild(document.createTextNode(x.q + '\n'));
+      t.appendChild(el('small', null, '→ ' + x.a));
+      const del = el('button', null, '削除');
+      del.onclick = () => {
+        if (!confirm('この問題を削除する？')) return;
+        store.user = store.user.filter(y => y.id !== x.id);
+        delete store.labels[x.id];
+        save(); renderUserList();
+      };
+      li.append(t, del); ul.appendChild(li);
+    });
+  }
+
+  $('exportBtn').onclick = () => {
+    const data = JSON.stringify({app: 'ichimon', v: 1, date: new Date().toISOString(), ...store}, null, 1);
+    try{
+      const blob = new Blob([data], {type: 'application/json'});
+      const a = document.createElement('a');
+      const d = new Date();
+      a.download = `ichimon-backup-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+      a.href = URL.createObjectURL(blob);
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      flash('backupMsg', '書き出したよ（ファイルアプリの「ダウンロード」に保存されるはず）');
+    }catch(e){ flash('backupMsg', '書き出しに失敗しちゃった'); }
+  };
+  $('importBtn').onclick = () => $('importFile').click();
+  $('importFile').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try{
+        const d = JSON.parse(rd.result);
+        if (!d || d.app !== 'ichimon') throw 0;
+        const r = addItems(d.user || []);
+        Object.assign(store.labels, d.labels || {}); save();
+        flash('backupMsg', `読み込んだよ（問題 ${r.added}問追加・印も復元）`);
+        renderUserList();
+      }catch(err){ flash('backupMsg', 'このファイルは読み込めなかったよ'); }
+      e.target.value = '';
+    };
+    rd.readAsText(f);
+  };
+
+  $('resetLabels').onclick = () => {
+    if (!confirm('「不安」「できた」の印を全部消すよ。いい？')) return;
+    store.labels = {}; save();
+    flash('backupMsg', '');
+    alert('印を消したよ');
+  };
+
+  newRound();
+
+  // オフライン対応（Webに置いたときだけ動く）
+  if ('serviceWorker' in navigator && location.protocol === 'https:'){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
